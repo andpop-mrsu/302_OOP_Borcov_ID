@@ -1,25 +1,26 @@
 <?php
-declare(strict_types=1);
 
 namespace App;
 
 class ProductCollection
 {
-    /** @var Product[] */
-    private array $products;
+    private $products = array();
 
-    public function __construct(array $products = [])
+    public function __construct(array $products)
     {
-        $this->products = array_values($products);
+        $this->products = $products;
     }
 
     public function filter(ProductFilteringStrategy $filterStrategy): ProductCollection
     {
-        $filtered = array_filter($this->products, [$filterStrategy, 'filter']);
-        return new ProductCollection($filtered);
+        $filteredProducts = array_filter($this->products, function ($product) use ($filterStrategy) {
+            return $filterStrategy->filter($product);
+        });
+
+        return new ProductCollection(array_values($filteredProducts));
     }
 
-    public function getProductsArray(): array
+    public function getProductsArray()
     {
         return $this->products;
     }
